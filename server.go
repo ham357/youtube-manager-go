@@ -2,16 +2,17 @@ package main
 
 import (
 	"youtube-manager-go/routes"
+	"youtube-manager-go/middlewares"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
 )
 
-func init()  {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
-		logrus.Fatalf(("Error loading .env"))
+		logrus.Fatalf("Error loading .env")
 	}
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&logrus.JSONFormatter{})
@@ -21,6 +22,7 @@ func main()  {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
+	e.Use(middlewares.YouTubeService())
 	routes.Init(e)
 
 	e.Logger.Fatal(e.Start(":8080"))
