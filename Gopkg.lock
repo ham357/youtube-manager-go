@@ -48,6 +48,22 @@
   version = "v2.0.5"
 
 [[projects]]
+  digest = "1:bfe1018424753e71cfcf4d7185a038670c4a46cad20c4504f2d0d323dd997068"
+  name = "github.com/jinzhu/gorm"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6f4358eeb5e3df768c182ae54d90ceacff0880a8"
+  version = "v1.9.16"
+
+[[projects]]
+  digest = "1:01ed62f8f4f574d8aff1d88caee113700a2b44c42351943fa73cc1808f736a50"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f5c5f50e6090ae76a29240b61ae2a90dd810112e"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:ecd9aa82687cf31d1585d4ac61d0ba180e42e8a6182b85bd785fcca8dfeefc1b"
   name = "github.com/joho/godotenv"
   packages = ["."]
@@ -393,12 +409,12 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/jinzhu/gorm",
     "github.com/joho/godotenv",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/sirupsen/logrus",
     "github.com/valyala/fasthttp",
-    "google.golang.org/api/option",
     "google.golang.org/api/youtube/v3",
   ]
   solver-name = "gps-cdcl"

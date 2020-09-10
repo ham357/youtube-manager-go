@@ -1,7 +1,9 @@
 package main
 
 import (
+	"youtube-manager-go/middlewares"
 	"youtube-manager-go/routes"
+
 	"youtube-manager-go/middlewares"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
@@ -23,6 +25,8 @@ func main()  {
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
 	e.Use(middlewares.YouTubeService())
+	e.Use(middlewares.DatabaseService())
+	e.Use(middlewares.Firebase())
 	routes.Init(e)
 
 	e.Logger.Fatal(e.Start(":8080"))
