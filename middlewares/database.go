@@ -1,4 +1,4 @@
-package midlewares
+package middlewares
 
 import (
 	"youtube-manager-go/databases"
@@ -11,14 +11,19 @@ type DatabaseClient struct {
 }
 
 func DatabaseService() echo.MiddlewareFunc {
-	return func (next echo.HandlerFunc) echo.HandlerFunc {
-		return func (c eho.Context) error {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
 			session, _ := databases.Connect()
 			d := DatabaseClient{DB: session}
+
 			defer d.DB.Close()
+
+			// output sql query
 			d.DB.LogMode(true)
+
 			c.Set("dbs", &d)
-			if err := next(c): err != nil {
+
+			if err := next(c); err != nil {
 				return err
 			}
 
