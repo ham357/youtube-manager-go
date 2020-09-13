@@ -1,6 +1,35 @@
 {
 	"comment": "",
 	"ignore": "test",
-	"package": [],
+	"package": [
+		{
+			"path": "appengine",
+			"revision": ""
+		},
+		{
+			"path": "appengine_internal",
+			"revision": ""
+		},
+		{
+			"path": "appengine_internal/base",
+			"revision": ""
+		},
+		{
+			"path": "github.com/ham357/youtube-manager-godatabases",
+			"revision": ""
+		},
+		{
+			"path": "github.com/ham357/youtube-manager-gomiddlewares",
+			"revision": ""
+		},
+		{
+			"path": "github.com/ham357/youtube-manager-gomodels",
+			"revision": ""
+		},
+		{
+			"path": "github.com/ham357/youtube-manager-goweb/api",
+			"revision": ""
+		}
+	],
 	"rootPath": "youtube-manager-go"
 }

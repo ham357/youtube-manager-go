@@ -1,8 +1,8 @@
 package api
 
 import (
-	"youtube-manager-go/middlewares"
-	"youtube-manager-go/models"
+	"github.com/ham357/youtube-manager-go/middlewares"
+	"github.com/ham357/youtube-manager-go/models"
 
 	"firebase.google.com/go/auth"
 	"github.com/labstack/echo"
@@ -12,12 +12,12 @@ import (
 )
 
 type VideoResponse struct {
-	VideoList *youtube.VideoListResponse `json:"video_list"`
+	VideoList  *youtube.VideoListResponse `json:"video_list"`
 	IsFavorite bool                       `json:"is_favorite"`
 }
 
 func GetVideos() echo.HandlerFunc {
-	return func (c echo.Context) error {
+	return func(c echo.Context) error {
 		yts := c.Get("yts").(*youtube.Service)
 		dbs := c.Get("dbs").(*middlewares.DatabaseClient)
 		token := c.Get("auth").(*auth.Token)
@@ -37,15 +37,15 @@ func GetVideos() echo.HandlerFunc {
 				isFavorite = true
 			}
 		}
-		lp := []string{"id","snippet"}
+		lp := []string{"id", "snippet"}
 		call := yts.Videos.List(lp).Id(videoId)
 		res, err := call.Do()
 
 		if err != nil {
-			logrus.Fatalf("ErrorcallingYoutubeAPI:%v",err)
+			logrus.Fatalf("ErrorcallingYoutubeAPI:%v", err)
 		}
-		v := VideoResponse {
-			VideoList: res,
+		v := VideoResponse{
+			VideoList:  res,
 			IsFavorite: isFavorite,
 		}
 

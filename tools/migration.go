@@ -1,8 +1,8 @@
 package main
 
 import (
-	"youtube-manager-go/databases"
-	"youtube-manager-go/models"
+	"github.com/ham357/youtube-manager-go/databases"
+	"github.com/ham357/youtube-manager-go/models"
 	"github.com/sirupsen/logrus"
 )
 

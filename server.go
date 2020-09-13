@@ -1,8 +1,8 @@
 package main
 
 import (
-	"youtube-manager-go/middlewares"
-	"youtube-manager-go/routes"
+	"github.com/ham357/youtube-manager-go/middlewares"
+	"github.com/ham357/youtube-manager-go/routes"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
@@ -19,7 +19,7 @@ func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 }
 
-func main()  {
+func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())

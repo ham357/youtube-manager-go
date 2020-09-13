@@ -1,8 +1,8 @@
 package api
 
 import (
-	"youtube-manager-go/middlewares"
-	"youtube-manager-go/models"
+	"github.com/ham357/youtube-manager-go/middlewares"
+	"github.com/ham357/youtube-manager-go/models"
 
 	"firebase.google.com/go/auth"
 	"github.com/labstack/echo"
@@ -12,7 +12,7 @@ import (
 )
 
 func FetchFavoriteVideos() echo.HandlerFunc {
-	return func (c echo.Context) error {
+	return func(c echo.Context) error {
 		dbs := c.Get("dbs").(*middlewares.DatabaseClient)
 		token := c.Get("auth").(*auth.Token)
 		user := models.User{}
@@ -30,7 +30,7 @@ func FetchFavoriteVideos() echo.HandlerFunc {
 		}
 
 		yts := c.Get("yts").(*youtube.Service)
-		lp := []string{"id","snippet"}
+		lp := []string{"id", "snippet"}
 		call := yts.Videos.List(lp).Id(videoIds).MaxResults(10)
 
 		res, err := call.Do()
