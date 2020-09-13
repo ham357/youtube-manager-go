@@ -72,3 +72,9 @@
 [[constraint]]
   name = "github.com/jstemmer/go-junit-report"
   version = "0.9.1"
+
+[metadata.heroku]
+  root-package = "github.com/ham357/youtube-manager-go"
+  go-version = "go1.15.1"
+  install = [ ".", "./cmd/..." ]
+  ensure = "true"
