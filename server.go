@@ -4,6 +4,8 @@ import (
 	"youtube-manager-go/middlewares"
 	"youtube-manager-go/routes"
 
+	"github.com/ham357/youtube-manager-gomiddlewares"
+
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"

@@ -4,6 +4,9 @@ import (
 	"youtube-manager-go/middlewares"
 	"youtube-manager-go/models"
 
+	"github.com/ham357/youtube-manager-gomiddlewares"
+	"github.com/ham357/youtube-manager-gomodels"
+
 	"firebase.google.com/go/auth"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
