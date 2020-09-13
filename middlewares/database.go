@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"youtube-manager-go/databases"
-
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 )

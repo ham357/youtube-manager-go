@@ -1,11 +1,9 @@
 package api
 
 import (
+	"firebase.google.com/go/auth"
 	"youtube-manager-go/middlewares"
 	"youtube-manager-go/models"
-
-	"firebase.google.com/go/auth"
-	"github.com/ham357/youtube-manager-gomiddlewares"
 	"github.com/labstack/echo"
 	"github.com/valyala/fasthttp"
 )

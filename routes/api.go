@@ -2,8 +2,7 @@ package routes
 
 import (
 	"youtube-manager-go/middlewares"
-
-	"github.com/ham357/youtube-manager-goweb/api"
+	"youtube-manager-go/web/api"
 
 	"github.com/labstack/echo"
 )
