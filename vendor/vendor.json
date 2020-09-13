@@ -43,22 +43,6 @@
 			"path": "github.com/ham357/youtube-manager-go/web/api",
 			"revision": "dd555025e178977f0f6c6133a81574e358cec667",
 			"revisionTime": "2020-09-13T10:29:55Z"
-		},
-		{
-			"path": "github.com/ham357/youtube-manager-godatabases",
-			"revision": ""
-		},
-		{
-			"path": "github.com/ham357/youtube-manager-gomiddlewares",
-			"revision": ""
-		},
-		{
-			"path": "github.com/ham357/youtube-manager-gomodels",
-			"revision": ""
-		},
-		{
-			"path": "github.com/ham357/youtube-manager-goweb/api",
-			"revision": ""
 		}
 	],
 	"rootPath": "youtube-manager-go"
