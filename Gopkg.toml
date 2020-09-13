@@ -76,5 +76,4 @@
 [metadata.heroku]
   root-package = "github.com/ham357/youtube-manager-go"
   go-version = "go1.15.1"
-  install = [ ".", "./cmd/..." ]
   ensure = "true"
