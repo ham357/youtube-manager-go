@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type (
@@ -24,6 +25,9 @@ type (
 
 		// SetRequest sets `*http.Request`.
 		SetRequest(r *http.Request)
+
+		// SetResponse sets `*Response`.
+		SetResponse(r *Response)
 
 		// Response returns `*Response`.
 		Response() *Response
@@ -39,6 +43,7 @@ type (
 
 		// RealIP returns the client's network address based on `X-Forwarded-For`
 		// or `X-Real-IP` request header.
+		// The behavior can be configured using `Echo#IPExtractor`.
 		RealIP() string
 
 		// Path returns the registered path for the handler.
@@ -179,6 +184,9 @@ type (
 		// Logger returns the `Logger` instance.
 		Logger() Logger
 
+		// Set the logger
+		SetLogger(l Logger)
+
 		// Echo returns the `Echo` instance.
 		Echo() *Echo
 
@@ -198,6 +206,8 @@ type (
 		handler  HandlerFunc
 		store    Map
 		echo     *Echo
+		logger   Logger
+		lock     sync.RWMutex
 	}
 )
 
@@ -226,13 +236,17 @@ func (c *context) Response() *Response {
 	return c.response
 }
 
+func (c *context) SetResponse(r *Response) {
+	c.response = r
+}
+
 func (c *context) IsTLS() bool {
 	return c.request.TLS != nil
 }
 
 func (c *context) IsWebSocket() bool {
 	upgrade := c.request.Header.Get(HeaderUpgrade)
-	return upgrade == "websocket" || upgrade == "Websocket"
+	return strings.ToLower(upgrade) == "websocket"
 }
 
 func (c *context) Scheme() string {
@@ -257,6 +271,10 @@ func (c *context) Scheme() string {
 }
 
 func (c *context) RealIP() string {
+	if c.echo != nil && c.echo.IPExtractor != nil {
+		return c.echo.IPExtractor(c.request)
+	}
+	// Fall back to legacy behavior
 	if ip := c.request.Header.Get(HeaderXForwardedFor); ip != "" {
 		return strings.Split(ip, ", ")[0]
 	}
@@ -292,6 +310,7 @@ func (c *context) ParamNames() []string {
 
 func (c *context) SetParamNames(names ...string) {
 	c.pnames = names
+	*c.echo.maxParam = len(names)
 }
 
 func (c *context) ParamValues() []string {
@@ -338,8 +357,12 @@ func (c *context) FormParams() (url.Values, error) {
 }
 
 func (c *context) FormFile(name string) (*multipart.FileHeader, error) {
-	_, fh, err := c.request.FormFile(name)
-	return fh, err
+	f, fh, err := c.request.FormFile(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return fh, nil
 }
 
 func (c *context) MultipartForm() (*multipart.Form, error) {
@@ -360,10 +383,15 @@ func (c *context) Cookies() []*http.Cookie {
 }
 
 func (c *context) Get(key string) interface{} {
+	c.lock.RLock()
+	defer c.lock.RUnlock()
 	return c.store[key]
 }
 
 func (c *context) Set(key string, val interface{}) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
 	if c.store == nil {
 		c.store = make(Map)
 	}
@@ -430,7 +458,7 @@ func (c *context) json(code int, i interface{}, indent string) error {
 		enc.SetIndent("", indent)
 	}
 	c.writeContentType(MIMEApplicationJSONCharsetUTF8)
-	c.response.WriteHeader(code)
+	c.response.Status = code
 	return enc.Encode(i)
 }
 
@@ -583,7 +611,15 @@ func (c *context) SetHandler(h HandlerFunc) {
 }
 
 func (c *context) Logger() Logger {
+	res := c.logger
+	if res != nil {
+		return res
+	}
 	return c.echo.Logger
+}
+
+func (c *context) SetLogger(l Logger) {
+	c.logger = l
 }
 
 func (c *context) Reset(r *http.Request, w http.ResponseWriter) {
@@ -594,7 +630,9 @@ func (c *context) Reset(r *http.Request, w http.ResponseWriter) {
 	c.store = nil
 	c.path = ""
 	c.pnames = nil
+	c.logger = nil
 	// NOTE: Don't reset because it has to have length c.echo.maxParam at all times
-	// c.pvalues = nil
+	for i := 0; i < *c.echo.maxParam; i++ {
+		c.pvalues[i] = ""
+	}
 }
-

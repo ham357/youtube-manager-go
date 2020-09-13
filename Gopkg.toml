@@ -60,3 +60,15 @@
 [[constraint]]
   name = "github.com/kardianos/govendor"
   version = "1.0.9"
+
+[[constraint]]
+  name = "github.com/tools/godep"
+  version = "80.0.0"
+
+[[constraint]]
+  name = "github.com/urfave/negroni"
+  version = "2.0.2"
+
+[[constraint]]
+  name = "github.com/jstemmer/go-junit-report"
+  version = "0.9.1"

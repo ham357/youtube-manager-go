@@ -68,21 +68,18 @@ func NewClient(ctx context.Context, projectID string, opts ...option.ClientOptio
 			return nil, fmt.Errorf("firestore: dialing address from env var FIRESTORE_EMULATOR_HOST: %s", err)
 		}
 		o = []option.ClientOption{option.WithGRPCConn(conn)}
-		if projectID == DetectProjectID {
-			projectID, _ = detectProjectID(ctx, opts...)
-			if projectID == "" {
-				projectID = "dummy-emulator-firestore-project"
-			}
-		}
 	}
 	o = append(o, opts...)
 
 	if projectID == DetectProjectID {
-		detected, err := detectProjectID(ctx, o...)
+		creds, err := transport.Creds(ctx, o...)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("fetching creds: %v", err)
 		}
-		projectID = detected
+		if creds.ProjectID == "" {
+			return nil, errors.New("firestore: see the docs on DetectProjectID")
+		}
+		projectID = creds.ProjectID
 	}
 
 	vc, err := vkit.NewClient(ctx, o...)
@@ -96,17 +93,7 @@ func NewClient(ctx context.Context, projectID string, opts ...option.ClientOptio
 		databaseID: "(default)", // always "(default)", for now
 	}
 	return c, nil
-}
 
-func detectProjectID(ctx context.Context, opts ...option.ClientOption) (string, error) {
-	creds, err := transport.Creds(ctx, opts...)
-	if err != nil {
-		return "", fmt.Errorf("fetching creds: %v", err)
-	}
-	if creds.ProjectID == "" {
-		return "", errors.New("firestore: see the docs on DetectProjectID")
-	}
-	return creds.ProjectID, nil
 }
 
 // Close closes any resources held by the client.

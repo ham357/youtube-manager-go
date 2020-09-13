@@ -41,7 +41,7 @@
 //
 // Multiple exporters can be registered to upload the data to various
 // different back ends.
-package view // import "go.opencensus.io/stats/view"
+package view
 
 // TODO(acetechnologist): Add a link to the language independent OpenCensus
 // spec when it is available.

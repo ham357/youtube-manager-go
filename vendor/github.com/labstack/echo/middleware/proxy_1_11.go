@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func proxyHTTP(tgt *ProxyTarget, c echo.Context, config ProxyConfig) http.Handler {
@@ -17,9 +17,9 @@ func proxyHTTP(tgt *ProxyTarget, c echo.Context, config ProxyConfig) http.Handle
 		if tgt.Name != "" {
 			desc = fmt.Sprintf("%s(%s)", tgt.Name, tgt.URL.String())
 		}
-		c.Logger().Errorf("remote %s unreachable, could not forward: %v", desc, err)
-		c.Error(echo.NewHTTPError(http.StatusServiceUnavailable))
+		c.Set("_error", echo.NewHTTPError(http.StatusBadGateway, fmt.Sprintf("remote %s unreachable, could not forward: %v", desc, err)))
 	}
 	proxy.Transport = config.Transport
+	proxy.ModifyResponse = config.ModifyResponse
 	return proxy
 }

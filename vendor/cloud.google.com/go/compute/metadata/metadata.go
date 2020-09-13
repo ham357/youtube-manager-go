@@ -17,7 +17,7 @@
 //
 // This package is a wrapper around the GCE metadata service,
 // as documented at https://developers.google.com/compute/docs/metadata.
-package metadata // import "cloud.google.com/go/compute/metadata"
+package metadata
 
 import (
 	"context"
@@ -140,7 +140,7 @@ func testOnGCE() bool {
 	}()
 
 	go func() {
-		addrs, err := net.DefaultResolver.LookupHost(ctx, "metadata.google.internal")
+		addrs, err := net.LookupHost("metadata.google.internal")
 		if err != nil || len(addrs) == 0 {
 			resc <- false
 			return
@@ -296,7 +296,6 @@ func (c *Client) getETag(suffix string) (value, etag string, err error) {
 		// being stable anyway.
 		host = metadataIP
 	}
-	suffix = strings.TrimLeft(suffix, "/")
 	u := "http://" + host + "/computeMetadata/v1/" + suffix
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {

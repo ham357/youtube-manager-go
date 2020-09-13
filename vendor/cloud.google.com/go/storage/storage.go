@@ -97,11 +97,7 @@ type Client struct {
 }
 
 // NewClient creates a new Google Cloud Storage client.
-// The default scope is ScopeFullControl. To use a different scope, like
-// ScopeReadOnly, use option.WithScopes.
-//
-// Clients should be reused instead of created as needed. The methods of Client
-// are safe for concurrent use by multiple goroutines.
+// The default scope is ScopeFullControl. To use a different scope, like ScopeReadOnly, use option.WithScopes.
 func NewClient(ctx context.Context, opts ...option.ClientOption) (*Client, error) {
 	var host, readHost, scheme string
 
@@ -353,7 +349,7 @@ var (
 )
 
 // v2SanitizeHeaders applies the specifications for canonical extension headers at
-// https://cloud.google.com/storage/docs/access-control/signed-urls-v2#about-canonical-extension-headers
+// https://cloud.google.com/storage/docs/access-control/signed-urls#about-canonical-extension-headers.
 func v2SanitizeHeaders(hdrs []string) []string {
 	headerMap := map[string][]string{}
 	for _, hdr := range hdrs {
@@ -401,7 +397,7 @@ func v2SanitizeHeaders(hdrs []string) []string {
 }
 
 // v4SanitizeHeaders applies the specifications for canonical extension headers
-// at https://cloud.google.com/storage/docs/authentication/canonical-requests#about-headers.
+// at https://cloud.google.com/storage/docs/access-control/signed-urls#about-canonical-extension-headers.
 //
 // V4 does a couple things differently from V2:
 // - Headers get sorted by key, instead of by key:value. We do this in
@@ -1051,10 +1047,6 @@ func (o *ObjectAttrs) toRawObject(bucket string) *raw.Object {
 	if !o.RetentionExpirationTime.IsZero() {
 		ret = o.RetentionExpirationTime.Format(time.RFC3339)
 	}
-	var ct string
-	if !o.CustomTime.IsZero() {
-		ct = o.CustomTime.Format(time.RFC3339)
-	}
 	return &raw.Object{
 		Bucket:                  bucket,
 		Name:                    o.Name,
@@ -1069,7 +1061,6 @@ func (o *ObjectAttrs) toRawObject(bucket string) *raw.Object {
 		StorageClass:            o.StorageClass,
 		Acl:                     toRawObjectACL(o.ACL),
 		Metadata:                o.Metadata,
-		CustomTime:              ct,
 	}
 }
 
@@ -1139,11 +1130,11 @@ type ObjectAttrs struct {
 	// data is rejected if its MD5 hash does not match this field.
 	MD5 []byte
 
-	// CRC32C is the CRC32 checksum of the object's content using the Castagnoli93
-	// polynomial. This field is read-only, except when used from a Writer or
-	// Composer. In those cases, if the SendCRC32C field in the Writer or Composer
-	// is set to is true, the uploaded data is rejected if its CRC32C hash does
-	// not match this field.
+	// CRC32C is the CRC32 checksum of the object's content using
+	// the Castagnoli93 polynomial. This field is read-only, except when
+	// used from a Writer. If set on a Writer and Writer.SendCRC32C
+	// is true, the uploaded data is rejected if its CRC32c hash does not
+	// match this field.
 	CRC32C uint32
 
 	// MediaLink is an URL to the object's content. This field is read-only.
@@ -1208,14 +1199,6 @@ type ObjectAttrs struct {
 	// Etag is the HTTP/1.1 Entity tag for the object.
 	// This field is read-only.
 	Etag string
-
-	// A user-specified timestamp which can be applied to an object. This is
-	// typically set in order to use the CustomTimeBefore and DaysSinceCustomTime
-	// LifecycleConditions to manage object lifecycles.
-	//
-	// CustomTime cannot be removed once set on an object. It can be updated to a
-	// later value but not to an earlier one.
-	CustomTime time.Time
 }
 
 // convertTime converts a time in RFC3339 format to time.Time.
@@ -1269,7 +1252,6 @@ func newObject(o *raw.Object) *ObjectAttrs {
 		Deleted:                 convertTime(o.TimeDeleted),
 		Updated:                 convertTime(o.Updated),
 		Etag:                    o.Etag,
-		CustomTime:              convertTime(o.CustomTime),
 	}
 }
 
@@ -1315,17 +1297,6 @@ type Query struct {
 	// the query. It's used internally and is populated for the user by
 	// calling Query.SetAttrSelection
 	fieldSelection string
-
-	// StartOffset is used to filter results to objects whose names are
-	// lexicographically equal to or after startOffset. If endOffset is also set,
-	// the objects listed will have names between startOffset (inclusive) and
-	// endOffset (exclusive).
-	StartOffset string
-
-	// EndOffset is used to filter results to objects whose names are
-	// lexicographically before endOffset. If startOffset is also set, the objects
-	// listed will have names between startOffset (inclusive) and endOffset (exclusive).
-	EndOffset string
 }
 
 // attrToFieldMap maps the field names of ObjectAttrs to the underlying field
@@ -1358,7 +1329,6 @@ var attrToFieldMap = map[string]string{
 	"Deleted":                 "timeDeleted",
 	"Updated":                 "updated",
 	"Etag":                    "etag",
-	"CustomTime":              "customTime",
 }
 
 // SetAttrSelection makes the query populate only specific attributes of
@@ -1380,7 +1350,7 @@ func (q *Query) SetAttrSelection(attrs []string) error {
 	}
 
 	if len(fieldSet) > 0 {
-		var b bytes.Buffer
+		var b strings.Builder
 		b.WriteString("items(")
 		first := true
 		for field := range fieldSet {

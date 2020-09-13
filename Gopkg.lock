@@ -39,22 +39,6 @@
   version = "v3.13.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:993867aae72f6a3ea7e34ab723d781135458d75d8501e503179766997f47ff51"
-  name = "github.com/Bowery/prompt"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "fa8279994f75f982bdae3c827a3afffd78a6fe0d"
-
-[[projects]]
-  branch = "master"
-  digest = "1:b78a58e00a1b951af4803ddfefbbcae14c7cacce3940ebad359c9d5582bf74a0"
-  name = "github.com/dchest/safefile"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "855e8d98f1852d48dde521e0522408d1fe7e836a"
-
-[[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
@@ -110,20 +94,26 @@
   version = "v0.5.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:ae4407ca7731ceb7b54b059fced30f335d32486a2148e262b19067261f959b42"
-  name = "github.com/google/shlex"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "e7afc7fbc51079733e9468cdfd1efcd7d196cd1d"
-
-[[projects]]
   digest = "1:766102087520f9d54f2acc72bd6637045900ac735b4a419b128d216f0c5c4876"
   name = "github.com/googleapis/gax-go"
   packages = ["v2"]
   pruneopts = "UT"
   revision = "bd5b16380fd03dc758d11cef74ba2e3bc8b0e8c2"
   version = "v2.0.5"
+
+[[projects]]
+  branch = "master"
+  digest = "1:96b64cebdbad3281fa1cc939d60ed668e39b613438a4456f24288b59663d7b81"
+  name = "github.com/ham357/youtube-manager-go"
+  packages = [
+    "databases",
+    "middlewares",
+    "models",
+    "routes",
+    "web/api",
+  ]
+  pruneopts = "UT"
+  revision = "db1ac66c3adc197e336fe5df0478eeedae0cf464"
 
 [[projects]]
   digest = "1:08e808af34e124a53916211335ca779762fca8034cf58bb7d14f20a748ef1c1d"
@@ -163,28 +153,6 @@
   pruneopts = "UT"
   revision = "cc1f095d5cc5eca2844f5c5ea7bb37f6b9bf6cac"
   version = "v0.9.1"
-
-[[projects]]
-  digest = "1:c30a6e246b86caf3a7fba88e9245913d20e1696887c52b60420df52f28be72d3"
-  name = "github.com/kardianos/govendor"
-  packages = [
-    ".",
-    "cliprompt",
-    "context",
-    "help",
-    "internal/pathos",
-    "internal/vfilepath",
-    "internal/vos",
-    "migrate",
-    "pkgspec",
-    "prompt",
-    "run",
-    "vcs",
-    "vendorfile",
-  ]
-  pruneopts = "UT"
-  revision = "f60bcdf2e61a16899c2bd0c793d5914842034455"
-  version = "v1.0.9"
 
 [[projects]]
   digest = "1:6dbdb48005dbf5814c8a9ccf12fc25a4f1c2c19d6261815c5b16558fe489afe8"
@@ -245,14 +213,6 @@
   pruneopts = "UT"
   revision = "7b513a986450394f7bbf1476909911b3aa3a55ce"
   version = "v0.0.12"
-
-[[projects]]
-  digest = "1:9e1d37b58d17113ec3cb5608ac0382313c5b59470b94ed97d0976e69c7022314"
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "614d223910a179a466c1767a985424175c39b465"
-  version = "v0.9.1"
 
 [[projects]]
   digest = "1:05eebdd5727fea23083fce0d98d307d70c86baed644178e81608aaa9f09ea469"
@@ -418,7 +378,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:11e67ccd152738fd1a74d74dd8236fe1ac8312aa8b842fecabd357931529aba3"
+  digest = "1:53aaa32c4ca647230dfd6ee54ef018a0160111f75cd5a10c33f473fa108210c3"
   name = "golang.org/x/tools"
   packages = [
     "cmd/goimports",
@@ -426,7 +386,6 @@
     "go/gcexportdata",
     "go/internal/gcimporter",
     "go/types/typeutil",
-    "go/vcs",
     "internal/event",
     "internal/event/core",
     "internal/event/keys",
@@ -620,24 +579,21 @@
   revision = "3f7a61f89bb6813f89d981d1870ed68da0b3c3f1"
   version = "v1.25.0"
 
-[[projects]]
-  digest = "1:d7f1bd887dc650737a421b872ca883059580e9f8314d601f88025df4f4802dce"
-  name = "gopkg.in/yaml.v2"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "0b1645d91e851e735d3e23330303ce81f70adbe3"
-  version = "v2.3.0"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "firebase.google.com/go",
     "firebase.google.com/go/auth",
+    "github.com/ham357/youtube-manager-go/databases",
+    "github.com/ham357/youtube-manager-go/middlewares",
+    "github.com/ham357/youtube-manager-go/models",
+    "github.com/ham357/youtube-manager-go/routes",
+    "github.com/ham357/youtube-manager-go/web/api",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/joho/godotenv",
-    "github.com/kardianos/govendor",
+    "github.com/jstemmer/go-junit-report",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/sirupsen/logrus",
