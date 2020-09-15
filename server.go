@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 )
 
 func init() {
@@ -32,5 +33,5 @@ func main() {
 	e.Use(middlewares.Firebase())
 	routes.Init(e)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Start(":"+os.Getenv("PORT"))
 }
