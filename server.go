@@ -22,7 +22,10 @@ func init() {
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000", "https://fathomless-mountain-71410.herokuapp.com"},
+		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+	}))
 	e.Use(middlewares.YouTubeService())
 	e.Use(middlewares.DatabaseService())
 	e.Use(middlewares.Firebase())
