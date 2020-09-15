@@ -24,7 +24,7 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000", "https://fathomless-mountain-71410.herokuapp.com"},
+		AllowOrigins: []string{"http://localhost:3000", "https://fathomless-mountain-71410.herokuapp.com", "https://peaceful-river-88642.herokuapp.com"},
 		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 	}))
 	e.Use(middlewares.YouTubeService())
