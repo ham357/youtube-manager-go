@@ -136,6 +136,10 @@ func pwHash(password []byte) (result [2]uint32) {
 
 // Hash password using insecure pre 4.1 method
 func scrambleOldPassword(scramble []byte, password string) []byte {
+	if len(password) == 0 {
+		return nil
+	}
+
 	scramble = scramble[:8]
 
 	hashPw := pwHash([]byte(password))
@@ -242,9 +246,6 @@ func (mc *mysqlConn) auth(authData []byte, plugin string) ([]byte, error) {
 	case "mysql_old_password":
 		if !mc.cfg.AllowOldPasswords {
 			return nil, ErrOldPassword
-		}
-		if len(mc.cfg.Passwd) == 0 {
-			return nil, nil
 		}
 		// Note: there are edge cases where this should work but doesn't;
 		// this is currently "wontfix":

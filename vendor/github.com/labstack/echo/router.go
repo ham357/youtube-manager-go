@@ -1,9 +1,6 @@
 package echo
 
-import (
-	"net/http"
-	"strings"
-)
+import "net/http"
 
 type (
 	// Router is the registry of all registered routes for an `Echo` instance for
@@ -36,7 +33,6 @@ type (
 		propfind HandlerFunc
 		put      HandlerFunc
 		trace    HandlerFunc
-		report   HandlerFunc
 	}
 )
 
@@ -61,7 +57,7 @@ func NewRouter(e *Echo) *Router {
 func (r *Router) Add(method, path string, h HandlerFunc) {
 	// Validate path
 	if path == "" {
-		path = "/"
+		panic("echo: path cannot be empty")
 	}
 	if path[0] != '/' {
 		path = "/" + path
@@ -83,13 +79,14 @@ func (r *Router) Add(method, path string, h HandlerFunc) {
 
 			if i == l {
 				r.insert(method, path[:i], h, pkind, ppath, pnames)
-			} else {
-				r.insert(method, path[:i], nil, pkind, "", nil)
+				return
 			}
+			r.insert(method, path[:i], nil, pkind, "", nil)
 		} else if path[i] == '*' {
 			r.insert(method, path[:i], nil, skind, "", nil)
 			pnames = append(pnames, "*")
 			r.insert(method, path[:i+1], h, akind, ppath, pnames)
+			return
 		}
 	}
 
@@ -135,11 +132,6 @@ func (r *Router) insert(method, path string, h HandlerFunc, t kind, ppath string
 		} else if l < pl {
 			// Split node
 			n := newNode(cn.kind, cn.prefix[l:], cn, cn.children, cn.methodHandler, cn.ppath, cn.pnames)
-
-			// Update parent path for all children to new node
-			for _, child := range cn.children {
-				child.parent = n
-			}
 
 			// Reset parent node
 			cn.kind = skind
@@ -256,8 +248,6 @@ func (n *node) addHandler(method string, h HandlerFunc) {
 		n.methodHandler.put = h
 	case http.MethodTrace:
 		n.methodHandler.trace = h
-	case REPORT:
-		n.methodHandler.report = h
 	}
 }
 
@@ -283,8 +273,6 @@ func (n *node) findHandler(method string) HandlerFunc {
 		return n.methodHandler.put
 	case http.MethodTrace:
 		return n.methodHandler.trace
-	case REPORT:
-		return n.methodHandler.report
 	default:
 		return nil
 	}
@@ -347,21 +335,7 @@ func (r *Router) Find(method, path string, c Context) {
 		if l == pl {
 			// Continue search
 			search = search[l:]
-			// Finish routing if no remaining search and we are on an leaf node
-			if search == "" && (nn == nil || cn.parent == nil || cn.ppath != "") {
-				break
-			}
-		}
-
-		// Attempt to go back up the tree on no matching prefix or no remaining search
-		if l != pl || search == "" {
-			// Handle special case of trailing slash route with existing any route (see #1526)
-			if path[len(path)-1] == '/' && cn.findChildByKind(akind) != nil {
-				goto Any
-			}
-			if nn == nil { // Issue #1348
-				return // Not found
-			}
+		} else {
 			cn = nn
 			search = ns
 			if nk == pkind {
@@ -369,6 +343,12 @@ func (r *Router) Find(method, path string, c Context) {
 			} else if nk == akind {
 				goto Any
 			}
+			// Not found
+			return
+		}
+
+		if search == "" {
+			break
 		}
 
 		// Static node
@@ -383,8 +363,8 @@ func (r *Router) Find(method, path string, c Context) {
 			continue
 		}
 
-	Param:
 		// Param node
+	Param:
 		if child = cn.findChildByKind(pkind); child != nil {
 			// Issue #378
 			if len(pvalues) == n {
@@ -408,58 +388,24 @@ func (r *Router) Find(method, path string, c Context) {
 			continue
 		}
 
-	Any:
 		// Any node
-		if cn = cn.findChildByKind(akind); cn != nil {
-			// If any node is found, use remaining path for pvalues
-			pvalues[len(cn.pnames)-1] = search
-			break
-		}
-
-		// No node found, continue at stored next node
-		// or find nearest "any" route
-		if nn != nil {
-			// No next node to go down in routing (issue #954)
-			// Find nearest "any" route going up the routing tree
-			search = ns
-			np := nn.parent
-			// Consider param route one level up only
-			if cn = nn.findChildByKind(pkind); cn != nil {
-				pos := strings.IndexByte(ns, '/')
-				if pos == -1 {
-					// If no slash is remaining in search string set param value
-					pvalues[len(cn.pnames)-1] = search
-					break
-				} else if pos > 0 {
-					// Otherwise continue route processing with restored next node
-					cn = nn
-					nn = nil
-					ns = ""
+	Any:
+		if cn = cn.findChildByKind(akind); cn == nil {
+			if nn != nil {
+				cn = nn
+				nn = cn.parent // Next (Issue #954)
+				search = ns
+				if nk == pkind {
 					goto Param
+				} else if nk == akind {
+					goto Any
 				}
 			}
-			// No param route found, try to resolve nearest any route
-			for {
-				np = nn.parent
-				if cn = nn.findChildByKind(akind); cn != nil {
-					break
-				}
-				if np == nil {
-					break // no further parent nodes in tree, abort
-				}
-				var str strings.Builder
-				str.WriteString(nn.prefix)
-				str.WriteString(search)
-				search = str.String()
-				nn = np
-			}
-			if cn != nil { // use the found "any" route and update path
-				pvalues[len(cn.pnames)-1] = search
-				break
-			}
+			// Not found
+			return
 		}
-		return // Not found
-
+		pvalues[len(cn.pnames)-1] = search
+		break
 	}
 
 	ctx.handler = cn.findHandler(method)

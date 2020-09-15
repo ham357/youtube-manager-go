@@ -77,3 +77,7 @@
   root-package = "github.com/ham357/youtube-manager-go"
   go-version = "go1.15.1"
   ensure = "true"
+
+[[constraint]]
+  branch = "master"
+  name = "google.golang.org/protobuf"

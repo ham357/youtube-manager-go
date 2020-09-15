@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	"firebase.google.com/go/v4/internal"
+	"firebase.google.com/go/internal"
 	"google.golang.org/api/iterator"
 )
 
@@ -92,8 +92,8 @@ func (nm nestedMap) Set(key string, value interface{}) {
 	}
 }
 
-func (nm nestedMap) UpdateMask() []string {
-	return buildMask(nm)
+func (nm nestedMap) UpdateMask() ([]string, error) {
+	return buildMask(nm), nil
 }
 
 func buildMask(data map[string]interface{}) []string {
@@ -654,7 +654,11 @@ func (c *baseClient) UpdateOIDCProviderConfig(ctx context.Context, id string, co
 		return nil, err
 	}
 
-	mask := body.UpdateMask()
+	mask, err := body.UpdateMask()
+	if err != nil {
+		return nil, fmt.Errorf("failed to construct update mask: %v", err)
+	}
+
 	req := &internal.Request{
 		Method: http.MethodPatch,
 		URL:    fmt.Sprintf("/oauthIdpConfigs/%s", id),
@@ -762,7 +766,11 @@ func (c *baseClient) UpdateSAMLProviderConfig(ctx context.Context, id string, co
 		return nil, err
 	}
 
-	mask := body.UpdateMask()
+	mask, err := body.UpdateMask()
+	if err != nil {
+		return nil, fmt.Errorf("failed to construct update mask: %v", err)
+	}
+
 	req := &internal.Request{
 		Method: http.MethodPatch,
 		URL:    fmt.Sprintf("/inboundSamlConfigs/%s", id),

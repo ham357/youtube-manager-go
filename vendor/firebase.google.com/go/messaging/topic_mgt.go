@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"strings"
 
-	"firebase.google.com/go/v4/internal"
+	"firebase.google.com/go/internal"
 )
 
 const (
@@ -29,6 +29,25 @@ const (
 	iidSubscribe   = "batchAdd"
 	iidUnsubscribe = "batchRemove"
 )
+
+var iidErrorCodes = map[string]struct{ Code, Msg string }{
+	"INVALID_ARGUMENT": {
+		invalidArgument,
+		"request contains an invalid argument; code: " + invalidArgument,
+	},
+	"NOT_FOUND": {
+		registrationTokenNotRegistered,
+		"request contains an invalid argument; code: " + registrationTokenNotRegistered,
+	},
+	"INTERNAL": {
+		internalError,
+		"server encountered an internal error; code: " + internalError,
+	},
+	"TOO_MANY_TOPICS": {
+		tooManyTopics,
+		"client exceeded the number of allowed topics; code: " + tooManyTopics,
+	},
+}
 
 // TopicManagementResponse is the result produced by topic management operations.
 //
@@ -48,7 +67,14 @@ func newTopicManagementResponse(resp *iidResponse) *TopicManagementResponse {
 			tmr.SuccessCount++
 		} else {
 			tmr.FailureCount++
-			reason := res["error"].(string)
+			code := res["error"].(string)
+			info, ok := iidErrorCodes[code]
+			var reason string
+			if ok {
+				reason = info.Msg
+			} else {
+				reason = unknownError
+			}
 			tmr.Errors = append(tmr.Errors, &ErrorInfo{
 				Index:  idx,
 				Reason: reason,
@@ -66,6 +92,7 @@ type iidClient struct {
 func newIIDClient(hc *http.Client) *iidClient {
 	client := internal.WithDefaultRetryConfig(hc)
 	client.CreateErrFn = handleIIDError
+	client.SuccessFn = internal.HasSuccessStatus
 	client.Opts = []internal.HTTPOption{internal.WithHeader("access_token_auth", "true")}
 	return &iidClient{
 		iidEndpoint: iidEndpoint,
@@ -107,7 +134,7 @@ type iidResponse struct {
 	Results []map[string]interface{} `json:"results"`
 }
 
-type iidErrorResponse struct {
+type iidError struct {
 	Error string `json:"error"`
 }
 
@@ -149,12 +176,15 @@ func (c *iidClient) makeTopicManagementRequest(ctx context.Context, req *iidRequ
 }
 
 func handleIIDError(resp *internal.Response) error {
-	base := internal.NewFirebaseError(resp)
-	var ie iidErrorResponse
+	var ie iidError
 	json.Unmarshal(resp.Body, &ie) // ignore any json parse errors at this level
-	if ie.Error != "" {
-		base.String = fmt.Sprintf("error while calling the iid service: %s", ie.Error)
+	var clientCode, msg string
+	info, ok := iidErrorCodes[ie.Error]
+	if ok {
+		clientCode, msg = info.Code, info.Msg
+	} else {
+		clientCode = unknownError
+		msg = fmt.Sprintf("client encountered an unknown error; response: %s", string(resp.Body))
 	}
-
-	return base
+	return internal.Errorf(clientCode, "http error status: %d; reason: %s", resp.Status, msg)
 }

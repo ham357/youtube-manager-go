@@ -532,7 +532,8 @@
   version = "v1.31.1"
 
 [[projects]]
-  digest = "1:d6eb738b0817c74e0184cafb71486bc984d4409dd9ffcecd74aea95d81fa02d6"
+  branch = "master"
+  digest = "1:00feb0c0da57d492d670df40be2e22347179c9270ad13b6223be89aff6cd3370"
   name = "google.golang.org/protobuf"
   packages = [
     "cmd/protoc-gen-go/internal_gengo",
@@ -549,13 +550,12 @@
     "internal/encoding/tag",
     "internal/encoding/text",
     "internal/errors",
-    "internal/fieldsort",
     "internal/filedesc",
     "internal/filetype",
     "internal/flags",
     "internal/genid",
     "internal/impl",
-    "internal/mapsort",
+    "internal/order",
     "internal/pragma",
     "internal/set",
     "internal/strs",
@@ -576,8 +576,7 @@
     "types/pluginpb",
   ]
   pruneopts = "UT"
-  revision = "3f7a61f89bb6813f89d981d1870ed68da0b3c3f1"
-  version = "v1.25.0"
+  revision = "db5c900f0ce544131509b33f6d68ec651e3ca91c"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -593,13 +592,13 @@
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/joho/godotenv",
-    "github.com/jstemmer/go-junit-report",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/sirupsen/logrus",
     "github.com/valyala/fasthttp",
     "google.golang.org/api/option",
     "google.golang.org/api/youtube/v3",
+    "google.golang.org/protobuf/internal/order",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

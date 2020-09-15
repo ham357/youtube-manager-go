@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package auth
+package auth // import "firebase.google.com/go/auth"
 
 import (
 	"context"
 
-	"firebase.google.com/go/v4/internal"
+	"firebase.google.com/go/internal"
 )
 
 func newCryptoSigner(ctx context.Context, conf *internal.AuthConfig) (cryptoSigner, error) {
